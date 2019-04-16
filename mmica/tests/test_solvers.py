@@ -1,3 +1,7 @@
+# Authors: Pierre Ablin <pierre.ablin@inria.fr>
+#
+# License: MIT
+
 import numpy as np
 
 from numpy.testing import assert_array_almost_equal

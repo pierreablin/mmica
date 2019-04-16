@@ -1,3 +1,6 @@
+# Authors: Pierre Ablin <pierre.ablin@inria.fr>
+#
+# License: MIT
 import os
 
 import numpy as np

@@ -1,3 +1,6 @@
+# Authors: Pierre Ablin <pierre.ablin@inria.fr>
+#
+# License: MIT
 import numpy as np
 from numba import jit
 

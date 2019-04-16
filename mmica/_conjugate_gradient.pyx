@@ -1,3 +1,7 @@
+# Authors: Pierre Ablin <pierre.ablin@inria.fr>
+#
+# License: MIT
+
 import cython
 cimport cython
 import numpy as np
