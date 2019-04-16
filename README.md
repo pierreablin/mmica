@@ -41,7 +41,7 @@ batch_size = 100
 A = np.random.randn(p, p)
 gen = (A.dot(np.random.laplace(size=(p, batch_size)))
        for _ in range(20))
-W = solver_online(gen, p, batch_size)
+W = solver_online(gen, p)
 
 print(np.dot(W, A))  # close from a permutation + scale matrix
 ```

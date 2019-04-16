@@ -73,7 +73,7 @@ def solver_incremental(X, max_iter=100, batch_size=100, W_init=None,
     return W
 
 
-def solver_online(sample_generator, p, batch_size, W_init=None,
+def solver_online(sample_generator, p, W_init=None,
                   density='huber', maxiter_cg=10, greedy=1, alpha=0.7):
     """
     Online algorithm for ICA
@@ -84,8 +84,6 @@ def solver_online(sample_generator, p, batch_size, W_init=None,
         should be a minibatch of size (p, batch_size)
     p : int
         Number of sources
-    batch_size : int
-        Mini-batch size
     W_init : array_like, shape (p, p), optional
         Initial guess for the unmixing matrix.
         Defaults to identity
@@ -111,6 +109,7 @@ def solver_online(sample_generator, p, batch_size, W_init=None,
         W = W_init.copy()
     A = np.zeros((p, p, p))
     for n, x in enumerate(sample_generator):
+        _, batch_size = x.shape
         y = np.dot(W, x)
         u = density.ustar(y)
         update_idx = gen_idx(p, greedy, batch_size)

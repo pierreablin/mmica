@@ -31,6 +31,6 @@ def test_solver_online():
     A = rng.randn(p, p)
     gen = (A.dot(rng.laplace(size=(p, batch_size)))
            for _ in range(20))
-    W = solver_online(gen, p, batch_size, alpha=0.7)
+    W = solver_online(gen, p, alpha=0.7)
     op = W.dot(A)
     assert_array_almost_equal(permute(op), np.eye(p), decimal=2)
