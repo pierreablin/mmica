@@ -3,12 +3,40 @@ import numba as nb
 from numba import njit
 
 from ._utils import cg
-from ._densities import Huber
+from ._densities import Huber, Sigmoid
 
 
 def solver_incremental(X, max_iter=100, batch_size=100, W_init=None,
-                       density=Huber(), maxiter_cg=10, greedy=0):
-    np.seterr(invalid='raise')
+                       density='huber', maxiter_cg=10, greedy=0):
+    """
+    Incremental algorithm for ICA
+    Parameters
+    ----------
+    X : array_like, shape (p, n)
+        The input data to be unmixed.
+    max_iter : int, optional
+        Maximum number of iterations
+    batch_size : int, optional
+        Mini-batch size
+    W_init : array_like, shape (p, p), optional
+        Initial guess for the unmixing matrix.
+        Defaults to identity
+    density : 'huber' or 'tanh', optional
+        The density to use
+    maxiter_cg : int, optional
+        The number of iterations of conjuagate gradient to perform
+    greedy : int, optional
+        The number of sources to update for each sample, chosen greedily.
+        If 0, each source is updated.
+    Returns
+    -------
+    W : array_like, shape (p, p)
+        The estimated unmixing matrix
+    """
+    density = {'huber': Huber(),
+               'tanh': Sigmoid()}.get(density)
+    if density is None:
+        raise ValueError('Density should either be tanh or huber')
     N, T = X.shape
     if W_init is None:
         W = np.eye(N)
@@ -42,8 +70,38 @@ def solver_incremental(X, max_iter=100, batch_size=100, W_init=None,
     return W
 
 
-def solver_online(sample_generator, p, batch_size, W_init=None, maxiter_cg=10,
-                  density=Huber(), alpha=0.7):
+def solver_online(sample_generator, p, batch_size, W_init=None,
+                  density='huber', maxiter_cg=10, greedy=1, alpha=0.7):
+    """
+    Online algorithm for ICA
+    Parameters
+    ----------
+    sample_generator: generator
+        The sample stream generator. The x in `for x in sample_generator:`
+        should be a minibatch of size (p, batch_size)
+    p : int
+        Number of sources
+    batch_size : int
+        Mini-batch size
+    W_init : array_like, shape (p, p), optional
+        Initial guess for the unmixing matrix.
+        Defaults to identity
+    density : 'huber' or 'tanh', optional
+        The density to use
+    maxiter_cg : int, optional
+        The number of iterations of conjuagate gradient to perform
+    greedy : int, optional
+        The number of sources to update for each sample, chosen randomly.
+        If 0, each source is updated.
+    Returns
+    -------
+    W : array_like, shape (p, p)
+        The estimated unmixing matrix
+    """
+    density = {'huber': Huber(),
+               'tanh': Sigmoid()}.get(density)
+    if density is None:
+        raise ValueError('Density should either be tanh or huber')
     if W_init is None:
         W = np.eye(p)
     else:
@@ -52,20 +110,20 @@ def solver_online(sample_generator, p, batch_size, W_init=None, maxiter_cg=10,
     for n, x in enumerate(sample_generator):
         y = np.dot(W, x)
         u = density.ustar(y)
-        update_idx = gen_idx(p, batch_size)
+        update_idx = gen_idx(p, greedy, batch_size)
         step = 1. / (n + 1) ** alpha
         A *= (1 - step)
-        u *= step * p
+        u *= step * p / greedy
         A += compute_A_idx(u, x, update_idx)
         W = min_W(W, A, maxiter_cg)
     return W
 
 
-def gen_idx(N, T):
+def gen_idx(N, g, T):
     b = np.arange(N)
-    n_tiles = int(T / N)
-    tmp = np.tile(b, n_tiles + 1)
-    return tmp[:T].reshape(1, T, order='F')
+    n_tiles = int(g * T / N)
+    tile = np.tile(b, n_tiles + 1)
+    return tile[: g * T].reshape(g, T, order='F')
 
 
 def duality_gap(y_new, y_old, u_old, density):
