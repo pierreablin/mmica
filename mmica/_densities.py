@@ -84,12 +84,10 @@ def scored_u(Y):
 @jit(parallel=True, fastmath=True)
 def ustar_u(Y):
     N, T = Y.shape
-    output = np.empty((N, T))
+    output = np.ones((N, T))
     for i in range(N):
         for j in range(T):
             y = np.abs(Y[i, j])
             if y > 1:
                 output[i, j] = 1. / y
-            else:
-                output[i, j] = 1.
     return output

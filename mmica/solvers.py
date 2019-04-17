@@ -74,7 +74,7 @@ def solver_incremental(X, max_iter=100, batch_size=100, W_init=None,
 
 
 def solver_online(sample_generator, p, W_init=None,
-                  density='huber', maxiter_cg=10, greedy=1, alpha=0.7):
+                  density='huber', maxiter_cg=10, greedy=0, alpha=0.7):
     """
     Online algorithm for ICA
     Parameters
@@ -90,7 +90,7 @@ def solver_online(sample_generator, p, W_init=None,
     density : 'huber' or 'tanh', optional
         The density to use
     maxiter_cg : int, optional
-        The number of iterations of conjuagate gradient to perform
+        The number of iterations of conjugate gradient to perform
     greedy : int, optional
         The number of sources to update for each sample, chosen randomly.
         If 0, each source is updated.
@@ -112,11 +112,15 @@ def solver_online(sample_generator, p, W_init=None,
         _, batch_size = x.shape
         y = np.dot(W, x)
         u = density.ustar(y)
-        update_idx = gen_idx(p, greedy, batch_size)
         step = 1. / (n + 1) ** alpha
         A *= (1 - step)
-        u *= step * p / greedy
-        A += compute_A_idx(u, x, update_idx)
+        if greedy:
+            u *= step * p / greedy
+            update_idx = gen_idx(p, greedy, batch_size)
+            A += compute_A_idx(u, x, update_idx)
+        else:
+            u *= step
+            A += compute_A(u, x)
         W = min_W(W, A, maxiter_cg)
     return W
 

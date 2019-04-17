@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 
-from distutils.core import setup
+from setuptools import setup
 from Cython.Build import cythonize
 
 
