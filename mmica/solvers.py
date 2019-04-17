@@ -73,8 +73,8 @@ def solver_incremental(X, max_iter=100, batch_size=100, W_init=None,
     return W
 
 
-def solver_online(sample_generator, p, W_init=None,
-                  density='huber', maxiter_cg=10, greedy=0, alpha=0.7):
+def solver_online(sample_generator, p, W_init=None, density='huber',
+                  maxiter_cg=10, greedy=0, alpha=0.7):
     """
     Online algorithm for ICA
     Parameters
