@@ -1,0 +1,6 @@
+numpy
+scipy
+cython
+numba
+pytest
+python-picard

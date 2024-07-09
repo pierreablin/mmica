@@ -4,7 +4,14 @@ This repository contains the code for the AISTATS 2019 paper "Stochastic algorit
 > Ablin, P., Gramfort, A., Cardoso, J.F. & Bach, F. (2019). Stochastic algorithms with descent guarantees for ICA. Proceedings of Machine Learning Research, in PMLR 89:1564-1573
 
 ### Installation
-To get started, clone the repository and run `python setup.py install`.
+To get started, clone the repository and run pip install.
+
+```shell
+git clone https://github.com/pierreablin/mmica
+cd mmica
+pip install --requirement requirements.txt
+pip install -e .
+```
 
 ### API
 

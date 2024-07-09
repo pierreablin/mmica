@@ -1,0 +1,23 @@
+[project]
+name = 'mmica'
+version = '0.1'
+authors = [ {name = 'Pierre Ablin', email ='pierreablin@gmail.com' } ]
+license = {text = "MIT License"}
+description = 'Stochastic algorithms for ICA'
+dependencies = ['numpy']
+
+[project.urls]
+repository = 'https://github.com/pierreablin/mmica'
+
+[build-system]
+requires = [
+    "setuptools >= 55",
+    "numpy",
+    "scipy",
+    "cython",
+]
+build-backend = "setuptools.build_meta"
+
+
+[tool.setuptools.package-data]
+mmica = ["*.pyx"]
